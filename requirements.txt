@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+scikit-learn
+pandas
+joblib
+sqlalchemy
+psycopg2-binary
+python-dotenv
+pydantic
+jupyterlab
+ipykernel
