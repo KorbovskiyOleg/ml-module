@@ -1,3 +1,4 @@
+scipy
 fastapi
 uvicorn[standard]
 scikit-learn
