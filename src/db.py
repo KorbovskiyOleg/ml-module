@@ -12,7 +12,7 @@ DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME")
 DB_SCHEMA = os.getenv("DB_SCHEMA", "ml_data")
 
-# --- Создаём подключение к PostgreSQL ---
+# --- Создаём подключение к PostgresSQL ---
 engine = create_engine(
     f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}",
     connect_args={"options": f"-csearch_path={DB_SCHEMA}"}
@@ -57,6 +57,8 @@ def insert_sample_data():
         ]
 
         with engine.begin() as conn:
+            # очищаем таблицу
+            conn.execute(text("TRUNCATE TABLE training_data RESTART IDENTITY;"))
             for row in sample_rows:
                 conn.execute(
                     text("""
@@ -71,9 +73,10 @@ def show_sample_data():
         with engine.connect() as conn:
             res = conn.execute(text("SELECT * FROM training_data LIMIT 5;"))
             rows = res.fetchall()
-            print("📊 Sample rows:")
-            for r in rows:
-                print(dict(r._mapping))
+            if rows:
+                print(f"✅ Данные успешно загружены в таблицу 'training_data'. ({len(rows)} строк)")
+            else:
+                print("⚠️ Таблица создана, но данные отсутствуют.")
 
 
 # --- Проверка всех таблиц в схеме ---
