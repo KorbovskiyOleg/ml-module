@@ -47,6 +47,35 @@ def create_training_table():
     metadata.create_all(engine)
     print("✅ Table 'training_data' is ready in schema:", DB_SCHEMA)
 
+    #--- Вставка тестовых данных--
+def insert_sample_data():
+        sample_rows = [
+            {"feature_1": 5.1, "feature_2": 3.5, "feature_3": 1.4, "label": 'cat'},
+            {"feature_1": 7.0, "feature_2": 3.2, "feature_3": 4.7, "label": 'dog'},
+            {"feature_1": 6.3, "feature_2": 3.3, "feature_3": 6.0, "label": 'horse'},
+
+        ]
+
+        with engine.begin() as conn:
+            for row in sample_rows:
+                conn.execute(
+                    text("""
+                        INSERT INTO training_data (feature_1, feature_2, feature_3, label)
+                        VALUES (:f1, :f2, :f3, :label)
+                    """),
+                    {"f1": row["feature_1"], "f2": row["feature_2"], "f3": row["feature_3"], "label": row["label"]}
+                )
+        print(f"🐍 Inserted {len(sample_rows)} sample rows into training_data.")
+
+def show_sample_data():
+        with engine.connect() as conn:
+            res = conn.execute(text("SELECT * FROM training_data LIMIT 5;"))
+            rows = res.fetchall()
+            print("📊 Sample rows:")
+            for r in rows:
+                print(dict(r._mapping))
+
+
 # --- Проверка всех таблиц в схеме ---
 def list_tables():
     with engine.connect() as conn:
@@ -67,4 +96,6 @@ if __name__ == "__main__":
     ensure_schema_exists()
     test_connection()
     create_training_table()
+    insert_sample_data()
+    show_sample_data()
     list_tables()
